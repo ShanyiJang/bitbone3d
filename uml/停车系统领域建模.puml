@@ -1,0 +1,290 @@
+@startuml
+!include lib_eventstorming.puml
+
+DomainEvent("VehicleEntered")[
+    车辆已入场
+    --
+    车牌号
+    通道号
+    入场时间
+]
+
+DomainEvent("VehicleParked")[
+    已泊车
+    --
+    车牌号
+    入场时间
+    车位号
+    泊入时间
+]
+
+DomainEvent("VehicleParkFailed")[
+    泊车失败
+    --
+    车牌号
+    车位号
+    泊入时间
+]
+
+DomainEvent("VehicleDeparked")[
+    已驶离车位
+    --
+    车牌号
+    车位号
+    驶离时间
+]
+
+DomainEvent("FeePaid")[
+    费用已支付
+    --
+    车牌号
+    入场时间
+    支付金额
+    支付时间
+]
+
+DomainEvent("VehicleExited")[
+    车辆已出场
+    --
+    车牌号
+    入场时间
+    出场时间
+    通道号
+]
+
+DomainEvent("VehicleEnterFailed")[
+    车辆入场已失败
+    --
+    入牌号
+    入场时间
+    通道号
+]
+
+DomainEvent("VehicleExitFailed")[
+    车辆出场已失败
+    --
+    车牌号
+    出场时间
+    通道号
+]
+
+DomainEvent("ParkingSpaceCreated")[
+    车位已创建
+    --
+    车位号
+    车位信息
+]
+
+Command("EnterVehicle")[
+    车辆入场
+    --
+    1. 车辆未入场才能入场，入场失败发布入场已失败事件
+    2. 入场成功发布车辆已入场事件
+    --
+    车牌号
+    通道号
+]
+
+Command("ParkVehicle")[
+    车辆泊入
+    --
+    1. 泊车成功发布已泊车事件
+    --
+    车位号
+    车牌号
+]
+
+Command("UnparkVehicle")[
+    车辆驶离
+    --
+    1. 发布已驶离事件
+    --
+    车位号
+]
+
+Command("ExitVehicle")[
+    车辆出场
+    --
+    1. 车辆已入场才能出场，否则发布出场失败事件
+    2. 必须费用已结清或出场时间在入场后15分钟之内
+    2. 出场成功后发布车辆已出场事件
+    --
+    车牌号
+    通道号
+]
+
+Command("PayParkingFee")[
+    支付费用
+    --
+    1. 车辆必须在场，且未结算
+    2. 发布费用已支付事件
+    --
+    车牌号
+    支付金额
+]
+
+Command("CreateParkingSpace")[
+    创建停车位
+    --
+    1. 车位号不能重复
+    --
+    车位号
+    车位信息
+]
+
+Aggregate("Parking")[
+    停车
+    --
+    车牌号
+    --
+    入场时间
+    累计付费金额
+    最后付费时间
+]
+
+Aggregate("ParkingSpace")[
+    停车位
+    --
+    车位号
+    --
+    车牌号
+]
+
+Policy("AlarmPolicy")[
+    报警策略
+    --
+    入场失败或出场失败时报警
+]
+
+Service("BillingService")[
+    计费服务
+    --
+    计费开始时间
+]
+
+Service("AlarmService")[
+    报警服务
+    --
+    车牌号
+    报警信息
+]
+
+Person("ParkingAdmin")[
+    停车管理员
+]
+
+Person("Turnstile")[
+    闸机
+]
+
+Person("ParkingSpaceSensor")[
+    车位传感器
+]
+
+Person("PaymentSystem")[
+    支付系统
+]
+
+
+FacadeCommand("ParkIn")[
+    车辆泊入
+    --
+    1. 车辆必须在场才能泊入，泊入失败发布泊车失败事件，泊车成功发布已泊车事件
+    --
+    车位号
+    车牌号
+]
+
+Service("ParkInService")[
+    车辆泊入服务
+    --
+    1. 如果车辆不在场，则返回泊入失败
+]
+
+ReadModel("InParkVehicleCounter ")[
+    在场数量
+    --
+    数量
+]
+
+ReadModel("ParkingSpaceMonitor")[
+    车位监控
+    --
+    车位号
+    --
+    车位信息
+    车牌号
+    泊入时间
+]
+
+ReadModel("ParkingRecord")[
+    停车记录
+    --
+    记录Id
+    --
+    车牌号
+    入场时间
+    入场通道号
+    最后泊车车位号
+    是否出场
+    出场时间
+    出场通道号
+    支付时间
+    支付费用
+]
+
+ReadModel("DailyIncome")[
+    每日收入
+    --
+    日期
+    --
+    总收入
+]
+
+ParkingAdmin -down-> CreateParkingSpace
+Turnstile -down-> EnterVehicle
+ParkingSpaceSensor -down-> ParkIn
+ParkIn -down-> ParkInService
+ParkInService -down-> Parking
+ParkInService -down-> ParkVehicle
+ParkingSpaceSensor -down-> UnparkVehicle
+Turnstile -down-> ExitVehicle
+ExitVehicle -down-> BillingService
+PaymentSystem -down-> PayParkingFee
+
+CreateParkingSpace -down-> ParkingSpace
+EnterVehicle -down-> Parking
+ExitVehicle -down-> Parking
+PayParkingFee -down-> Parking
+ParkVehicle -down-> ParkingSpace
+UnparkVehicle -down-> ParkingSpace
+
+Parking -down-> VehicleEntered
+Parking -down-> VehicleEnterFailed
+Parking -down-> VehicleExited
+Parking -down-> VehicleExitFailed
+Parking -down-> FeePaid
+
+ParkingSpace -down-> VehicleParked
+ParkingSpace -down-> VehicleDeparked
+ParkingSpace -down-> VehicleParkFailed
+ParkingSpace -down-> ParkingSpaceCreated
+
+VehicleEntered -down-> InParkVehicleCounter
+VehicleEntered -down-> ParkingRecord
+VehicleExited -down-> ParkingRecord
+FeePaid -down-> ParkingRecord
+VehicleExited -down-> DailyIncome
+ParkingSpaceCreated -down-> ParkingSpaceMonitor
+VehicleParked -down-> ParkingSpaceMonitor
+VehicleDeparked -down-> ParkingSpaceMonitor
+VehicleParked -down-> ParkingRecord
+
+VehicleEnterFailed -down-> AlarmPolicy
+VehicleExitFailed -down-> AlarmPolicy
+VehicleParkFailed -down-> AlarmPolicy
+
+AlarmPolicy -down-> AlarmService
+
+
+@enduml

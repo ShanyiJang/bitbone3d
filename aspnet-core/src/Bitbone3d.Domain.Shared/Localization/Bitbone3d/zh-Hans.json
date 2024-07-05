@@ -1,0 +1,10 @@
+{
+  "culture": "zh-Hans",
+  "texts": {
+    "Menu:Home": "首页",
+    "Welcome": "欢迎",
+    "LongWelcomeMessage": "欢迎使用本应用程序。这是一个基于 ABP 框架的启动项目。更多信息，请访问 abp.io。",
+    "Bitbone3d.DddParking:0001": "停车费用未结清，请结清后重新出场。",
+    "Bitbone3d.DddParking:0002": "车辆 {0} 未入场。"
+  }
+}

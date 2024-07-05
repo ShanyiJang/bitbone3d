@@ -1,0 +1,10 @@
+{
+  "culture": "en",
+  "texts": {
+    "Menu:Home": "Home",
+    "Welcome": "Welcome",
+    "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information, visit abp.io.",
+    "Bitbone3d.DddParking:0001": "The parking fee has not been settled. Please settle the balance and exit again.",
+    "Bitbone3d.DddParking:0002": "Vehicle {0} has not entered."
+  }
+}
