@@ -67,7 +67,8 @@ public class ParkingRecordModel : Entity<Guid>, IHasConcurrencyStamp, IMultiTena
         }
 
         TotalPaidAmount += amount;
-        if (payTime > LastPayTime)
+        if (!LastPayTime.HasValue
+            || payTime > LastPayTime)
         {
             LastPayTime = payTime;
         }
@@ -80,6 +81,7 @@ public class ParkingRecordModel : Entity<Guid>, IHasConcurrencyStamp, IMultiTena
             throw new UserFriendlyException($"停车记录 {Id} 状态异常，出场失败！");
         }
 
+        Exited = true;
         ExitLane = exitLane;
         ExitTime = exitTime;
     }

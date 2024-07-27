@@ -214,7 +214,8 @@ namespace Bitbone3d.Migrations
                         .HasColumnName("TenantId");
 
                     b.Property<decimal>("TotalPaidAmount")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(20, 6)
+                        .HasColumnType("decimal(20,6)");
 
                     b.HasKey("Id");
 

@@ -12,7 +12,7 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Bitbone3d.Migrations
 {
     [DbContext(typeof(Bitbone3dDbContext))]
-    [Migration("20240705032411_AddParking")]
+    [Migration("20240726133941_AddParking")]
     partial class AddParking
     {
         /// <inheritdoc />
@@ -217,7 +217,8 @@ namespace Bitbone3d.Migrations
                         .HasColumnName("TenantId");
 
                     b.Property<decimal>("TotalPaidAmount")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(20, 6)
+                        .HasColumnType("decimal(20,6)");
 
                     b.HasKey("Id");
 

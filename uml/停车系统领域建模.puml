@@ -9,6 +9,13 @@ DomainEvent("VehicleEntered")[
     入场时间
 ]
 
+DomainEvent("ParkedAtSpace")[
+    已泊入车位
+    --
+    车牌号
+    车位号
+]
+
 DomainEvent("VehicleParked")[
     已泊车
     --
@@ -85,6 +92,15 @@ Command("EnterVehicle")[
     通道号
 ]
 
+Command("ParkIntoSpace")[
+    泊入车位
+    --
+    1. 车辆已入场才能泊入车位
+    --
+    车牌号
+    车位号
+]
+
 Command("ParkVehicle")[
     车辆泊入
     --
@@ -92,6 +108,14 @@ Command("ParkVehicle")[
     --
     车位号
     车牌号
+]
+
+Command("ExitUnparkVehicle")[
+    车辆离场驶离
+    --
+    1. 发布已驶离事件
+    --
+    车位号
 ]
 
 Command("UnparkVehicle")[
@@ -140,6 +164,7 @@ Aggregate("Parking")[
     入场时间
     累计付费金额
     最后付费时间
+    最后停放车位号
 ]
 
 Aggregate("ParkingSpace")[
@@ -148,6 +173,18 @@ Aggregate("ParkingSpace")[
     车位号
     --
     车牌号
+]
+
+Policy("UnparkVehiclePolicy")[
+    车辆出场
+    --
+    当车辆出场后如果依然占用车位则需要驶离车位
+]
+
+Policy("ParkIntoSpacePolicy")[
+    泊入车位
+    --
+    当车位上有车泊入时需要触发泊入车位事件
 ]
 
 Policy("AlarmPolicy")[
@@ -252,6 +289,8 @@ Turnstile -down-> ExitVehicle
 ExitVehicle -down-> BillingService
 PaymentSystem -down-> PayParkingFee
 
+ParkIntoSpace -down-> Parking
+Parking -down-> ParkedAtSpace
 CreateParkingSpace -down-> ParkingSpace
 EnterVehicle -down-> Parking
 ExitVehicle -down-> Parking
@@ -283,6 +322,12 @@ VehicleParked -down-> ParkingRecord
 VehicleEnterFailed -down-> AlarmPolicy
 VehicleExitFailed -down-> AlarmPolicy
 VehicleParkFailed -down-> AlarmPolicy
+
+VehicleExited -down-> UnparkVehiclePolicy
+UnparkVehiclePolicy -down-> UnparkVehicle
+
+VehicleParked -down-> ParkIntoSpacePolicy
+ParkIntoSpacePolicy -> ParkIntoSpace
 
 AlarmPolicy -down-> AlarmService
 

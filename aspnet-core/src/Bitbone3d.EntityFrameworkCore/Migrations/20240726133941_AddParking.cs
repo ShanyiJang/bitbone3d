@@ -103,7 +103,7 @@ namespace Bitbone3d.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Exited = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     LastPayTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    TotalPaidAmount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    TotalPaidAmount = table.Column<decimal>(type: "decimal(20,6)", precision: 20, scale: 6, nullable: false),
                     ExitLane = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ExitTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),

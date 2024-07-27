@@ -46,8 +46,6 @@ public class ParkingSpace : AggregateRoot<Guid>, IMultiTenant
 
     internal void Unpark(DateTime deparkedAt)
     {
-        ParkingLicensePlateNo = null;
-
         if (!ParkingLicensePlateNo.IsNullOrEmpty())
         {
             AddLocalEvent(
@@ -60,5 +58,7 @@ public class ParkingSpace : AggregateRoot<Guid>, IMultiTenant
                 }
             );
         }
+        
+        ParkingLicensePlateNo = null;
     }
 }

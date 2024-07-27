@@ -1,6 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Bitbone3d.DddParking.Commands;
 using Bitbone3d.DddParking.Dtos;
+using Bitbone3d.DddParking.Repositories;
+using Bitbone3d.DddParking.ViewModels;
+using Volo.Abp.Application.Dtos;
 
 namespace Bitbone3d.DddParking;
 
@@ -10,6 +14,7 @@ namespace Bitbone3d.DddParking;
 public class ParkingSpaceAppService(
     ParkInManager parkVehicleCommandHandler,
     UnparkVehicleCommandHandler unparkVehicleCommandHandler,
+    IParkingSpaceMonitorRepository parkingSpaceMonitorRepository,
     CreateParkingSpaceCommandHandler createParkingSpaceCommandHandler
 ) : Bitbone3dAppService, IParkingSpaceAppService
 {
@@ -61,6 +66,23 @@ public class ParkingSpaceAppService(
                 ParkingSpaceCode = input.ParkingSpaceCode,
                 OperationTime = Clock.Now
             }
+        );
+    }
+
+    /// <summary>
+    /// 获取车位状态
+    /// </summary>
+    /// <param name="input">查询条件</param>
+    /// <returns></returns>
+    public async Task<ListResultDto<ParkingSpaceStatusDto>> GetStatusListAsync(GetParkingStatusListInputDto input)
+    {
+        var parkingSpaces = await parkingSpaceMonitorRepository.GetListAsync(
+            input.IsAvailable,
+            input.Sorting
+        );
+
+        return new ListResultDto<ParkingSpaceStatusDto>(
+            ObjectMapper.Map<List<ParkingSpaceMonitorModel>, List<ParkingSpaceStatusDto>>(parkingSpaces)
         );
     }
 }

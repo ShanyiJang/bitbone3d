@@ -96,7 +96,7 @@ public static class ParkingDbContextModelBuilderExtensions
                 b.Property(x => x.LastParkingSpaceCode).HasMaxLength(ParkingConsts.MaxParkingSpaceCodeLength);
                 b.Property(x => x.Exited).IsRequired();
                 b.Property(x => x.LastPayTime);
-                b.Property(x => x.TotalPaidAmount).IsRequired();
+                b.Property(x => x.TotalPaidAmount).HasPrecision(20, 6).IsRequired();
                 b.Property(x => x.ExitLane).HasMaxLength(ParkingConsts.MaxEntryLaneLength);
                 b.Property(x => x.ExitTime);
 

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Bitbone3d.DddParking.Dtos;
+using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 
 namespace Bitbone3d.DddParking;
@@ -29,4 +30,11 @@ public interface IParkingSpaceAppService : IApplicationService
     /// <param name="input">驶离信息</param>
     /// <returns></returns>
     Task UnParkAsync(ParkingSpaceUnparkInputDto input);
+
+    /// <summary>
+    /// 获取车位状态
+    /// </summary>
+    /// <param name="input">查询条件</param>
+    /// <returns></returns>
+    Task<ListResultDto<ParkingSpaceStatusDto>> GetStatusListAsync(GetParkingStatusListInputDto input);
 }
